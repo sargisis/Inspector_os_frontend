@@ -74,7 +74,7 @@ export function ControlPanel({
       // Ignore if input focused (e.g. altitude slider if it was precise input) or generic inputs
       if (["INPUT", "TEXTAREA"].includes((e.target as HTMLElement).tagName)) return;
 
-      if (!connected || isBusy) return;
+      if (!connected || isBusy || autopilotActive) return;
 
       switch (e.key.toLowerCase()) {
         case "t":
@@ -147,36 +147,36 @@ export function ControlPanel({
 
       <button
         className="ctrl-btn ok"
-        disabled={!connected || isBusy}
+        disabled={!connected || isBusy || autopilotActive}
         onClick={() => handleCommand("takeoff", () => ApiService.takeoff())}
-        title="Shortcut: T"
+        title={autopilotActive ? "Disable Autopilot to Takeoff" : "Shortcut: T"}
       >
         {loadingAction === "takeoff" ? "⏳ Taking off..." : "🛫 Takeoff [T]"}
       </button>
 
       <button
         className="ctrl-btn warning"
-        disabled={!connected || isBusy}
+        disabled={!connected || isBusy || autopilotActive}
         onClick={() => handleCommand("land", () => ApiService.land())}
-        title="Shortcut: L"
+        title={autopilotActive ? "Disable Autopilot to Land" : "Shortcut: L"}
       >
         {loadingAction === "land" ? "⏳ Landing..." : "🛬 Land [L]"}
       </button>
 
       <button
         className="ctrl-btn neutral"
-        disabled={!connected || isBusy}
+        disabled={!connected || isBusy || autopilotActive}
         onClick={() => handleCommand("hold", () => ApiService.hold())}
-        title="Shortcut: H or Space"
+        title={autopilotActive ? "Disable Autopilot to Hold" : "Shortcut: H or Space"}
       >
         {loadingAction === "hold" ? "⏳ Holding..." : "✋ Hold [H]"}
       </button>
 
       <button
         className="ctrl-btn primary"
-        disabled={!connected || isBusy}
+        disabled={!connected || isBusy || autopilotActive}
         onClick={() => handleCommand("return", () => ApiService.returnToHome())}
-        title="Shortcut: R"
+        title={autopilotActive ? "Disable Autopilot to Return" : "Shortcut: R"}
       >
         {loadingAction === "return" ? "⏳ Returning..." : "🏠 Return [R]"}
       </button>
@@ -195,7 +195,7 @@ export function ControlPanel({
           step="5"
           defaultValue="0"
           className="altitude-slider"
-          disabled={!connected || isBusy}
+          disabled={!connected || isBusy || autopilotActive}
           onChange={(e) => {
             const val = Number(e.target.value);
             const display = document.getElementById('alt-val-display');
