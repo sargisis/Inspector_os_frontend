@@ -34,7 +34,7 @@ export const TimelineSlider: React.FC<TimelineSliderProps> = ({ onFrameSelect, e
             try {
                 // Use configured URL or default to localhost
                 const baseUrl = (import.meta as any).env.VITE_BACKEND_HTTP_URL || 'http://localhost:8080';
-                const response = await fetch(`${baseUrl}/history?limit=1000`);
+                const response = await fetch(`${baseUrl}/api/v0.0.5/history?limit=1000`);
                 if (!response.ok) throw new Error('Network response was not ok');
                 const data = await response.json();
                 setInternalHistory(data);

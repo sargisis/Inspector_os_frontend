@@ -71,7 +71,7 @@ export function useTelemetry(paused = false) {
             ? window.location.port
             : "8080");
 
-        return `${protocol}://${host}:${port}/ws`;
+        return `${protocol}://${host}:${port}/api/v0.0.5/ws`;
       })();
 
     // CONNECT FUNCTION

@@ -42,7 +42,10 @@
   flex-direction: column;
   gap: 24px;
   position: relative;
-  overflow: hidden;
+  position: relative;
+  overflow-y: auto;
+  padding-bottom: 120px;
+  /* Space for TimelineSlider */
   transition: all var(--transition-med);
   width: 280px;
   min-width: 280px;
@@ -464,24 +467,18 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 32px;
-  background: linear-gradient(145deg, rgba(17, 24, 39, 0.8), rgba(17, 24, 39, 0.4));
+  background: var(--card-hero-bg);
 }
 
-/* Hero Left */
+
+
 .hero-left {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.hero-battery {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  padding: 20px;
-  border-radius: var(--radius-md);
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px solid var(--border-subtle);
+align-items: center;
+gap: 24px;
+padding: 20px;
+border-radius: var(--radius-md);
+background: var(--bg-surface-soft);
+border: 1px solid var(--border-subtle);
 }
 
 .hero-battery-info {
@@ -514,7 +511,7 @@
   font-size: 11px;
   padding: 4px 10px;
   border-radius: var(--radius-pill);
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--tag-bg);
   border: 1px solid var(--border-subtle);
   color: var(--text-soft);
 }
@@ -531,7 +528,7 @@
 .battery-track,
 .speed-track {
   fill: none;
-  stroke: rgba(255, 255, 255, 0.05);
+  stroke: var(--battery-ring-bg);
   stroke-width: 12;
 }
 
@@ -640,7 +637,7 @@
 
 /* Mini Map */
 .mini-map {
-  background: rgba(0, 0, 0, 0.3);
+  background: var(--mini-map-bg);
   border-radius: var(--radius-md);
   border: 1px solid var(--border-subtle);
   padding: 16px;

@@ -395,6 +395,16 @@ function App() {
     top: `${miniMapHalf - miniMapY}px`,
   };
 
+  // === LAST COMMAND ===
+  const [lastCommand, setLastCommand] = useState<string>("--");
+
+  // === ERROR STATE ===
+  const [lastError, setLastError] = useState<string | null>(null);
+
+  // === AUTOPILOT STATE ===
+  const [autopilotActive, setAutopilotActive] = useState(false);
+  const [autopilotMode, setAutopilotMode] = useState<string>("Offline");
+
   useEffect(() => {
     let cancelled = false;
 
@@ -403,10 +413,18 @@ function App() {
         const json = await ApiService.getState();
         if (!cancelled) {
           setSystemStats({
-            tick: json.tick ?? 0,
-            uptime: json.uptime ?? 0,
-            connected_clients: json.connected_clients ?? 0,
+            tick: json.metrics?.tick ?? 0,
+            uptime: json.metrics?.uptime ?? 0,
+            connected_clients: json.metrics?.connected_clients ?? 0,
           });
+          // Check deeper structure based on backend response: json.status.autopilot_state.active
+          if (json.status?.autopilot_state) {
+            setAutopilotActive(json.status.autopilot_state.active);
+            setAutopilotMode(json.status.autopilot_state.mode);
+          }
+          if (json.status?.last_command) {
+            setLastCommand(json.status.last_command);
+          }
         }
       } catch (error) {
         if (!cancelled) {
@@ -427,10 +445,24 @@ function App() {
     };
   }, []);
 
+  const toggleAutopilot = async () => {
+    try {
+      if (autopilotActive) {
+        await ApiService.stopAutopilot();
+      } else {
+        await ApiService.startAutopilot();
+      }
+      // Optimistic update, real state comes from polling
+      setAutopilotActive(!autopilotActive);
+    } catch (e) {
+      console.error("Failed to toggle autopilot", e);
+    }
+  };
+
   return (
     <div className={`app-root ${theme}`}>
       {ui?.safe_mode && <div className="safe-mode-border" />}
-      <NotificationToast event={activeEvent} onDismiss={() => setTestEvent(null)} />
+      {/* Toast moved to bottom for global context */}
       {showHistory && <HistoryView onClose={() => setShowHistory(false)} />}
       <LogSelectionModal
         isOpen={showLogModal}
@@ -484,29 +516,6 @@ function App() {
             </div>
           </div>
 
-          {/* NEW CONTROL PANEL */}
-          <ControlPanel
-            connected={connected}
-            follow={follow}
-            mapVisible={mapVisible}
-            onToggleFollow={() => setFollow((v) => !v)}
-            onToggleMap={() => setMapVisible((v) => !v)}
-            onResetPath={() => setTrail([])}
-            onClearWarnings={() => console.log("CLEAR WARNINGS TODO")}
-            onReconnect={() => window.location.reload()}
-            onViewHistory={() => setShowHistory(true)}
-            gpsDrift={gpsDrift}
-            onToggleGpsDrift={() => setGpsDrift(v => !v)}
-            muted={muted}
-            onToggleMute={() => setMuted(v => !v)}
-
-            onGoLive={() => {
-              setHistoryFrame(null);
-              setLoadedLog(null);
-            }}
-            showGoLive={historyFrame !== null || loadedLog !== null}
-            onShutdown={handleShutdown}
-          />
 
           {/* LINK STATUS */}
           <div className="sidebar-section">
@@ -752,7 +761,7 @@ function App() {
                           className="altitude-bar-fill"
                           style={{
                             height: `${altitudeFillPercent}%`,
-                            background: `linear-gradient(180deg, ${altitudeColor}, rgba(15,23,42,0.9))`,
+                            background: `linear-gradient(180deg, ${altitudeColor}, var(--altitude-fade))`,
                             boxShadow: `0 0 24px ${altitudeGlow}`,
                           }}
                         />
@@ -1049,6 +1058,47 @@ function App() {
                 </div>
               </section>
 
+              {/* CONTROLS */}
+              <section className="card card-controls">
+                <div className="card-header">
+                  <div>
+                    <div className="card-title">Mission Control</div>
+                    <div className="card-subtitle">
+                      Manual overrides
+                    </div>
+                  </div>
+                </div>
+                <div className="card-body">
+                  <ControlPanel
+                    connected={connected}
+                    follow={follow}
+                    mapVisible={mapVisible}
+                    onToggleFollow={() => setFollow((v) => !v)}
+                    onToggleMap={() => setMapVisible((v) => !v)}
+                    onResetPath={() => setTrail([])}
+                    onClearWarnings={() => console.log("CLEAR WARNINGS TODO")}
+                    onReconnect={() => window.location.reload()}
+                    onViewHistory={() => setShowHistory(true)}
+                    gpsDrift={gpsDrift}
+                    onToggleGpsDrift={() => setGpsDrift((v) => !v)}
+                    muted={muted}
+                    onToggleMute={() => setMuted((v) => !v)}
+                    onGoLive={() => {
+                      setHistoryFrame(null);
+                      setLoadedLog(null);
+                    }}
+                    showGoLive={historyFrame !== null || loadedLog !== null}
+                    onShutdown={handleShutdown}
+                    gridMode={true}
+                    autopilotActive={autopilotActive}
+                    onToggleAutopilot={toggleAutopilot}
+                    lastCommand={lastCommand}
+                    autopilotMode={autopilotMode}
+                    onError={(msg) => setLastError(msg)}
+                  />
+                </div>
+              </section>
+
               {/* LOGS */}
               {showLogs && (
                 <section className="card card-logs">
@@ -1092,7 +1142,15 @@ function App() {
           setLoadedLog(null);
         }}
       />
-    </div>
+      <NotificationToast
+        event={activeEvent}
+        message={lastError}
+        onDismiss={() => {
+          setTestEvent(null);
+          setLastError(null);
+        }}
+      />
+    </div >
   );
 }
 

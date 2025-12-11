@@ -4,48 +4,62 @@ import "./NotificationToast.css";
 
 interface NotificationToastProps {
     event: Event | null;
+    message?: string | null; // Generic message override
     onDismiss: () => void;
 }
 
-export function NotificationToast({ event, onDismiss }: NotificationToastProps) {
+export function NotificationToast({ event, message, onDismiss }: NotificationToastProps) {
     const [visible, setVisible] = useState(false);
-    const [hasShown, setHasShown] = useState(false); // 🔥 NEW: prevent re-trigger
+    const [hasShown, setHasShown] = useState(false);
 
     useEffect(() => {
-        if (!event) return;
+        // Condition to show:
+        // 1. New severe event
+        // 2. New generic message
+        if (!event && !message) return;
 
-        // Already shown → do NOT show again
         if (hasShown) return;
 
-        // Only show if severe
-        if (event.severity > 80) {
+        if (message || (event && event.severity > 80)) {
             setVisible(true);
-            setHasShown(true); // mark as shown
+            setHasShown(true);
 
             const timer = setTimeout(() => {
                 setVisible(false);
-
-                // Call parent dismiss AFTER animation
                 setTimeout(onDismiss, 300);
-            }, 3000); // show 3 sec
+            }, 3000);
 
             return () => clearTimeout(timer);
         }
-    }, [event, hasShown, onDismiss]);
+    }, [event, message, hasShown, onDismiss]);
+
+    // Reset hasShown when the input prop changes effectively (new event or new message)
+    // Actually, parent passes null then new object/string.
+    // If we want to support consecutive same messages, parent must clear it first.
+    useEffect(() => {
+        if (!event && !message) {
+            setHasShown(false); // Reset so next one shows
+        }
+    }, [event, message]);
+
 
     const handleClose = () => {
         setVisible(false);
         setTimeout(onDismiss, 300);
     };
 
-    if (!event || !visible) return null;
+    if ((!event && !message) || !visible) return null;
+
+    const isError = !!message;
+    const title = isError ? "COMMAND ERROR" : `SEVERE ALERT: ${event?.type}`;
+    const desc = isError ? message : event?.message;
 
     return (
-        <div className="notification-toast">
-            <div className="toast-icon">⚠️</div>
+        <div className={`notification-toast ${isError ? "toast-error" : ""}`}>
+            <div className="toast-icon">{isError ? "⛔" : "⚠️"}</div>
             <div className="toast-content">
-                <div className="toast-title">SEVERE ALERT: {event.type}</div>
-                <div className="toast-message">{event.message}</div>
+                <div className="toast-title">{title}</div>
+                <div className="toast-message">{desc}</div>
             </div>
             <button className="toast-close" onClick={handleClose}>
                 ✖
