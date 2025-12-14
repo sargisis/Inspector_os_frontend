@@ -1,0 +1,179 @@
+:root {
+  /* --- PALETTE: DEEP SPACE & NEON --- */
+  --bg-main: #030712;
+  /* Very dark blue/gray */
+  --bg-surface: rgba(17, 24, 39, 0.7);
+  /* Glassy surface */
+  --bg-surface-soft: rgba(31, 41, 55, 0.4);
+  /* Softer surface */
+  --bg-sidebar: rgba(17, 24, 39, 0.6);
+
+  --border-subtle: rgba(148, 163, 184, 0.15);
+  --border-strong: rgba(148, 163, 184, 0.3);
+
+  --text: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-soft: #64748b;
+
+  /* --- ACCENTS --- */
+  --accent: #10b981;
+  /* Emerald */
+  --accent-glow: rgba(16, 185, 129, 0.4);
+  --primary: #0ea5e9;
+  /* Sky Blue */
+  --primary-glow: rgba(14, 165, 233, 0.4);
+
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --safe: #10b981;
+
+  /* --- HUD SPECIFIC --- */
+  --hud-risk-safe: #10b981;
+  --hud-risk-low: #facc15;
+  --hud-risk-medium: #f97316;
+  --hud-risk-high: #ef4444;
+
+  --hud-overlay-bg: rgba(3, 7, 18, 0.85);
+  --hud-overlay-card: #0f172a;
+
+  /* --- SHADOWS & GLOWS --- */
+  --shadow-soft: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 20px rgba(14, 165, 233, 0.15);
+  --glass-blur: blur(20px);
+
+  /* --- TYPOGRAPHY --- */
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  /* --- RADIUS --- */
+  --radius-lg: 24px;
+  --radius-md: 16px;
+  --radius-sm: 8px;
+  --radius-pill: 9999px;
+
+  /* --- ANIMATION --- */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-med: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* --- BUTTONS --- */
+  --btn-secondary-bg: rgba(255, 255, 255, 0.03);
+  --btn-ghost-hover: rgba(255, 255, 255, 0.05);
+  --btn-text-primary: #38bdf8;
+  --btn-bg-primary: rgba(14, 165, 233, 0.1);
+  --btn-border-primary: rgba(14, 165, 233, 0.3);
+  --btn-text-success: #34d399;
+  --btn-bg-success: rgba(16, 185, 129, 0.1);
+  --btn-border-success: rgba(16, 185, 129, 0.3);
+  --btn-text-danger: #f87171;
+  --btn-bg-danger: rgba(239, 68, 68, 0.1);
+  --btn-border-danger: rgba(239, 68, 68, 0.3);
+  --btn-shine: rgba(255, 255, 255, 0.05);
+
+  /* --- COMPONENT SPECIFIC --- */
+  --card-hero-bg: linear-gradient(145deg, rgba(17, 24, 39, 0.9), rgba(17, 24, 39, 0.5));
+  --mini-map-bg: rgba(0, 0, 0, 0.3);
+  --altitude-fade: rgba(15, 23, 42, 0.9);
+  --battery-ring-bg: rgba(255, 255, 255, 0.05);
+  --tag-bg: rgba(255, 255, 255, 0.05);
+}
+
+/* LIGHT MODE OVERRIDES - Premium, Clean, Airy */
+:root[data-theme="light"] {
+  --bg-main: #f1f5f9;
+  /* Slate 100/50 mix */
+  --bg-surface: rgba(255, 255, 255, 0.85);
+  /* Frosty white */
+  --bg-surface-soft: rgba(255, 255, 255, 0.6);
+  /* Softer white */
+  --bg-sidebar: rgba(255, 255, 255, 0.75);
+
+  --border-subtle: rgba(148, 163, 184, 0.25);
+  --border-strong: rgba(148, 163, 184, 0.4);
+
+  --text: #0f172a;
+  /* Slate 900 - Sharp Contrast */
+  --text-muted: #52637a;
+  /* Slate 600 */
+  --text-soft: #94a3b8;
+  /* Slate 400 */
+
+  --hud-overlay-card: #ffffff;
+  --hud-risk-safe: #10b981;
+  /* Keep safe green */
+  --hud-risk-medium: #f97316;
+  /* Keep */
+  --hud-risk-high: #ef4444;
+  /* Keep */
+
+  /* Shadows - Diffuse & Multi-layered for depth */
+  --shadow-soft:
+    0 4px 6px -1px rgba(0, 0, 0, 0.03),
+    0 10px 15px -3px rgba(0, 0, 0, 0.05),
+    0 0 0 1px rgba(0, 0, 0, 0.02);
+  --shadow-glow: 0 0 20px rgba(14, 165, 233, 0.2);
+
+  /* Button Overrides */
+  --btn-secondary-bg: rgba(0, 0, 0, 0.03);
+  --btn-ghost-hover: rgba(0, 0, 0, 0.04);
+
+  --btn-text-primary: #0369a1;
+  /* Darker blue used for text */
+  --btn-bg-primary: rgba(14, 165, 233, 0.12);
+  /* Slightly stronger bg */
+  --btn-border-primary: rgba(14, 165, 233, 0.3);
+
+  --btn-text-success: #059669;
+  --btn-bg-success: rgba(16, 185, 129, 0.12);
+  --btn-border-success: rgba(16, 185, 129, 0.3);
+
+  --btn-text-danger: #dc2626;
+  --btn-bg-danger: rgba(239, 68, 68, 0.12);
+  --btn-border-danger: rgba(239, 68, 68, 0.3);
+  --btn-shine: rgba(255, 255, 255, 0.4);
+
+  /* Component Specific Light Mode */
+  --card-hero-bg: linear-gradient(135deg, #ffffff, #f1f5f9);
+  --mini-map-bg: rgba(241, 245, 249, 0.8);
+  --altitude-fade: rgba(255, 255, 255, 0.9);
+  --battery-ring-bg: rgba(0, 0, 0, 0.08);
+  /* Darker track for contrast */
+  --tag-bg: rgba(0, 0, 0, 0.04);
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background-color: var(--bg-main);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+  /* App shell handles scroll */
+}
+
+/* RESET & UTILS */
+button {
+  font-family: inherit;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-subtle);
+  border-radius: 99px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-strong);
+}
