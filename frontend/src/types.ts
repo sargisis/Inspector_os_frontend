@@ -1,4 +1,4 @@
-export type EventType = "LowBattery" | "HighAltitude" | "Instability" | "Anomaly";
+export type EventType = "LowBattery" | "HighAltitude" | "Instability" | "Anomaly" | "Override";
 
 export interface Event {
     type: EventType;

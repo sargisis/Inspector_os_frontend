@@ -32,12 +32,23 @@ export function HistoryView({ onClose }: Props) {
 
   const intervalRef = useRef<number | null>(null);
 
+  const [events, setEvents] = useState<any[]>([]); // Use any or import Event type
+
   useEffect(() => {
-    async function fetchHistory() {
+    async function fetchHistoryAndEvents() {
       try {
-        const json = await ApiService.getHistory(500);
-        const sortedHistory = json.reverse();
+        const [historyJson, eventsJson] = await Promise.all([
+          ApiService.getHistory(500),
+          ApiService.getRecentEvents()
+        ]);
+
+        const sortedHistory = historyJson.reverse();
         setHistory(sortedHistory);
+
+        // Filter for overrides
+        const overrides = eventsJson.filter((e: any) => e.type === "Override");
+        setEvents(overrides);
+
         setCurrentIndex(0);
       } catch (e: any) {
         setError(e.message);
@@ -46,7 +57,7 @@ export function HistoryView({ onClose }: Props) {
       }
     }
 
-    fetchHistory();
+    fetchHistoryAndEvents();
   }, []);
 
   useEffect(() => {
@@ -127,7 +138,36 @@ export function HistoryView({ onClose }: Props) {
                     </select>
                   </div>
                 </div>
-                <div className="timeline-slider">
+                <div className="timeline-slider" style={{ position: "relative" }}>
+                  {/* [ANTIGRAVITY] Override Markers */}
+                  {events.map((evt, idx) => {
+                    if (history.length < 2) return null;
+                    const start = history[0].timestamp;
+                    const end = history[history.length - 1].timestamp;
+                    // Only show if within range
+                    if (evt.timestamp < start || evt.timestamp > end) return null;
+
+                    const pct = ((evt.timestamp - start) / (end - start)) * 100;
+                    return (
+                      <div
+                        key={idx}
+                        className="timeline-marker"
+                        style={{
+                          left: `${pct}%`,
+                          position: "absolute",
+                          top: "50%",
+                          transform: "translate(-50%, -50%)",
+                          width: "4px",
+                          height: "12px",
+                          background: "#ef4444",
+                          zIndex: 5,
+                          pointerEvents: "none",
+                          borderRadius: "2px"
+                        }}
+                        title={`Override: ${evt.message}`}
+                      />
+                    );
+                  })}
                   <input
                     type="range"
                     min="0"
@@ -135,6 +175,7 @@ export function HistoryView({ onClose }: Props) {
                     value={currentIndex}
                     onChange={(e) => setCurrentIndex(Number(e.target.value))}
                     className="slider"
+                    style={{ position: "relative", zIndex: 10 }}
                   />
                   <div className="timeline-labels">
                     <span>{new Date(history[0]?.timestamp).toLocaleTimeString()}</span>

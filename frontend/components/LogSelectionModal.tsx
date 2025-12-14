@@ -23,7 +23,7 @@ export const LogSelectionModal: React.FC<LogSelectionModalProps> = ({ isOpen, on
         setError(null);
         try {
             const baseUrl = (import.meta as any).env.VITE_BACKEND_HTTP_URL || 'http://localhost:8080';
-            const response = await fetch(`${baseUrl}/logs`);
+            const response = await fetch(`${baseUrl}/api/v0.0.5/logs`);
             if (!response.ok) throw new Error('Failed to fetch logs');
             const data = await response.json();
             setLogs(data);

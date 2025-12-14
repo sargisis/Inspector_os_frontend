@@ -10,6 +10,8 @@ import { NotificationToast } from "../components/NotificationToast";
 import { EventAlertPanel } from "../components/EventAlertPanel";
 import { TimelineSlider } from "../components/TimelineSlider";
 import { LogSelectionModal } from "../components/LogSelectionModal";
+import { OverrideAlert } from "../components/OverrideAlert"; // [ANTIGRAVITY] Import new component
+import { OverrideHistory } from "../components/OverrideHistory"; // [ANTIGRAVITY] Add OverrideHistory import
 import type { Event } from "./types";
 import {
   ALTITUDE_CONFIG,
@@ -84,6 +86,7 @@ function App() {
   // Log selection state
   const [showLogModal, setShowLogModal] = useState(false);
   const [loadedLog, setLoadedLog] = useState<any[] | null>(null);
+  const [showOverrideHistory, setShowOverrideHistory] = useState(false);
 
 
 
@@ -101,12 +104,24 @@ function App() {
   // Test event state
   const [testEvent, setTestEvent] = useState<Event | null>(null);
 
+  // Override Alert State
+  const [showOverrideAlert, setShowOverrideAlert] = useState(false);
+  const [overrideMessage, setOverrideMessage] = useState<string>("");
+
   // Sound state
   const [muted, setMuted] = useState(loadBool("muted", false));
   const lastAlertTime = useRef<number>(0);
 
   // Combine real and test events
   const activeEvent = testEvent || lastEvent;
+
+  // React to Override events
+  useEffect(() => {
+    if (activeEvent?.type === "Override") {
+      setShowOverrideAlert(true);
+      setOverrideMessage(activeEvent.message);
+    }
+  }, [activeEvent]);
 
   const handleSimulateAlert = () => {
     setTestEvent({
@@ -464,6 +479,7 @@ function App() {
       {ui?.safe_mode && <div className="safe-mode-border" />}
       {/* Toast moved to bottom for global context */}
       {showHistory && <HistoryView onClose={() => setShowHistory(false)} />}
+      {showOverrideHistory && <OverrideHistory onClose={() => setShowOverrideHistory(false)} />}
       <LogSelectionModal
         isOpen={showLogModal}
         onClose={() => setShowLogModal(false)}
@@ -632,6 +648,10 @@ function App() {
 
               <button className="ctrl-btn secondary" onClick={() => setShowLogModal(true)}>
                 📂 Load Log
+              </button>
+
+              <button className="ctrl-btn secondary" onClick={() => setShowOverrideHistory(true)}>
+                🛡️ Override History
               </button>
 
               <button
@@ -996,9 +1016,11 @@ function App() {
                     <li>🟦 SAFE — nominal envelope</li>
                   </ul>
 
-                  {aiSignals.length > 0 && (
-                    <div className="ai-signal-grid">
-                      {aiSignals.slice(0, 4).map((s: any, idx: number) => (
+                  <div className="ai-signal-grid">
+                    {aiSignals.length === 0 ? (
+                      <div className="ai-signal-placeholder">No active signals</div>
+                    ) : (
+                      aiSignals.slice(0, 4).map((s: any, idx: number) => (
                         <div key={idx} className="ai-signal-card">
                           <div className="ai-signal-header">
                             <span className="ai-signal-source">{s.source}</span>
@@ -1006,9 +1028,9 @@ function App() {
                           </div>
                           <div className="ai-signal-detail">{s.detail}</div>
                         </div>
-                      ))}
-                    </div>
-                  )}
+                      ))
+                    )}
+                  </div>
                 </div>
               </section>
 
@@ -1149,6 +1171,11 @@ function App() {
           setTestEvent(null);
           setLastError(null);
         }}
+      />
+      <OverrideAlert
+        visible={showOverrideAlert}
+        message={overrideMessage}
+        onDismiss={() => setShowOverrideAlert(false)}
       />
     </div >
   );

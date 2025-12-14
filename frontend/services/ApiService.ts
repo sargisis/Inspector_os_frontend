@@ -155,6 +155,12 @@ export const ApiService = {
         if (!res.ok) throw new Error(`Failed to fetch risk profile: ${res.statusText}`);
         return res.json();
     },
+    async getOverrideStatus(): Promise<boolean> {
+        // Placeholder or actual endpoint if it exists
+        const res = await fetch(`${API_HTTP_URL}/api/v0.0.5/override`);
+        if (!res.ok) throw new Error("Failed to fetch override status");
+        return res.json();
+    },
     async getSystemIntegrity(): Promise<any> {
         const res = await fetch(`${API_HTTP_URL}/api/v0.0.5/integrity`);
         if (!res.ok) throw new Error(`Failed to fetch system integrity: ${res.statusText}`);

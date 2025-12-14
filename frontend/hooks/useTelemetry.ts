@@ -158,9 +158,28 @@ export function useTelemetry(paused = false) {
             }
             lastTick = tick;
 
+            // [ANTIGRAVITY] Fix: Handle potential object structure for battery
+            let batteryVal = json.telemetry.battery;
+
+            // Fallback: Check for root-level voltage if battery is 0/missing
+            let voltage = (typeof batteryVal === 'object' && batteryVal !== null) ? batteryVal.voltage : json.telemetry.voltage; // Check root voltage too
+
+            if (voltage !== undefined) {
+              // Assume 4S LiPo: 12.0V (0%) to 16.8V (100%)
+              // Lowered minV to 12.0V to account for voltage sag/reserve capacity
+              const minV = 12.0;
+              const maxV = 16.8;
+
+              const pct = ((voltage - minV) / (maxV - minV)) * 100;
+              batteryVal = Math.round(Math.max(0, Math.min(100, pct)));
+            } else if (typeof batteryVal === 'object') {
+              batteryVal = 0; // Object but no voltage?
+            }
+
             if (!paused) {
               setData({
                 ...json.telemetry,
+                battery: batteryVal,
                 risk_level: json.risk_level,
                 system_integrity: json.system_integrity ?? "Ok",
               });
@@ -170,7 +189,7 @@ export function useTelemetry(paused = false) {
                   `[${new Date().toLocaleTimeString()}] tick=${tick} ` +
                   `alt=${json.telemetry.altitude.toFixed(1)} ` +
                   `speed=${json.telemetry.speed.toFixed(1)} ` +
-                  `batt=${json.telemetry.battery}%`;
+                  `batt=${batteryVal}%`;
 
                 const updated = [...prev, entry];
                 return updated.slice(-TELEMETRY_LIMITS.logRetention);
